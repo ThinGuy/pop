@@ -5,11 +5,19 @@ Path management for Ubuntu Pro on Premises (PoP)
 import os
 import datetime
 import logging
-from typing import Dict
+from typing import Dict, Any
 
 
 def setup_paths(args) -> Dict[str, str]:
-    """Set up and return paths based on configuration"""
+    """
+    Set up and return paths based on configuration
+    
+    Args:
+        args: Command-line arguments
+    
+    Returns:
+        Dictionary of system paths
+    """
     pop_dir = args.pop_dir
     
     # Define all paths relative to the base directory
@@ -41,7 +49,16 @@ def setup_paths(args) -> Dict[str, str]:
 
 
 def save_configuration(args, paths) -> None:
-    """Save configuration to RC file"""
+    """
+    Save configuration to RC file
+    
+    Args:
+        args: Command-line arguments
+        paths: Dictionary of system paths
+    
+    Returns:
+        None
+    """
     rc_file = paths["pop_rc_file"]
     
     try:
@@ -83,8 +100,16 @@ def save_configuration(args, paths) -> None:
         logging.error(f"Failed to save configuration: {e}")
 
 
-def load_configuration(rc_file: str) -> Dict:
-    """Load configuration from RC file"""
+def load_configuration(rc_file: str) -> Dict[str, Any]:
+    """
+    Load configuration from RC file
+    
+    Args:
+        rc_file: Path to RC file
+    
+    Returns:
+        Dictionary of configuration values
+    """
     config = {}
     
     try:
