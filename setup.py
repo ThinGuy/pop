@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Ubuntu Pro on Premises (PoP) - setup.py
+# Revision: 5.0.0
 
 from setuptools import setup, find_packages
 
