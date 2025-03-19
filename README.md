@@ -1,12 +1,17 @@
-# Ubuntu Pro on Premises appliance (PoP)
+# Ubuntu Pro on Premises (PoP)
 
 [![License](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Ubuntu](https://img.shields.io/badge/Ubuntu-20.04%2B-orange)](https://ubuntu.com/)
 [![Security](https://img.shields.io/badge/Security-FIPS%20Ready-brightgreen)](https://ubuntu.com/security)
 
+
 ![Ubuntu Pro](img/Ubuntu-Pro-Logo-Light.jpg)
 
 **PoP** is a secure, air-gapped solution designed to deliver **Ubuntu Pro** services in isolated environments. It enables enterprises to bring the full power of Ubuntu Pro to networks without direct internet access, ensuring critical security updates and certified packages are available.
+
+## About This Project
+
+This repository contains a modular implementation of the PoP tooling, designed for better maintainability and extensibility. The code has been refactored from a monolithic script into a well-organized Python package.
 
 ## Features
 
@@ -21,32 +26,30 @@
 - **FIPS Compliance**: Built-in FIPS mode for VM deployments
 - **Size Estimation**: Preview mirror size before downloading
 
-## Requirements
-
-- Ubuntu 20.04 LTS (Focal) or later
-- Valid Ubuntu Pro token
-- Administrative (sudo) privileges
-- Minimum 20GB of free disk space (more recommended for package mirroring)
-- 4GB RAM or more
-
 ## Installation
 
 ### Quick Start
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/pop.git
+git clone https://github.com/ThinGuy/pop.git
 cd pop
 
-# Run the installer with your Ubuntu Pro token
-sudo ./pop.py --token YOUR_TOKEN
+# Install the package
+sudo pip install -e .
+
+# Run PoP with your Ubuntu Pro token
+sudo pop --token YOUR_TOKEN
 ```
 
 ### Advanced Installation
 
 ```bash
+# Install with all dependencies
+sudo pip install -e '.[dev,test]'
+
 # Full installation with custom settings
-sudo ./pop.py \
+sudo pop \
   --token YOUR_TOKEN \
   --dir /path/to/pop \
   --release jammy \
@@ -60,216 +63,101 @@ sudo ./pop.py \
   --verbose
 ```
 
-## Usage Examples
+## Project Structure
 
-### Basic PoP Server Setup
-
-```bash
-sudo ./pop.py --token YOUR_TOKEN
-```
-
-### Mirror for Multiple Architectures
-
-```bash
-sudo ./pop.py --token YOUR_TOKEN --arch amd64,arm64,s390x
-```
-
-### Create Build Templates
-
-```bash
-sudo ./pop.py --token YOUR_TOKEN --create-build-map
-```
-
-### Reconfigure with New Token
-
-```bash
-sudo ./pop.py --token NEW_TOKEN --reconfigure
-```
-
-### Use Local Mirror Hostname
-
-```bash
-sudo ./pop.py --token YOUR_TOKEN --mirror-host pop.example.com
-```
-
-### Estimate Mirror Size
-
-```bash
-sudo ./pop.py --token YOUR_TOKEN --estimate-size
-```
-
-### Complete Air-Gapped Solution
-
-```bash
-sudo ./pop.py \
-  --token YOUR_TOKEN \
-  --generate-web-ui \
-  --create-build-map \
-  --mirror-host air-gap.internal \
-  --estimate-size
-```
-
-## Configuration Options
-
-| Option | Description | Default |
-|--------|-------------|---------|
-| `--token` | Ubuntu Pro token (required) | None |
-| `--dir` | Base installation directory | `/srv/pop` |
-| `--release` | Ubuntu release codename | Current LTS |
-| `--arch` | Comma-separated list of architectures | `amd64` |
-| `--entitlements` | Comma-separated list of entitlements | `infra,apps,fips,fips-updates,fips-preview,cis,usg` |
-| `--include-source` | Include source packages in the mirror | False |
-| `--mirror-host` | Override hostname for repository URLs | System hostname or IP |
-| `--mirror-port` | Port for the local mirror server | `80` |
-| `--contract-port` | Port for the contracts server | `8484` |
-| `--tls-cert` | Path to custom TLS certificate | None |
-| `--tls-key` | Path to custom TLS key | None |
-| `--offline-repo` | PPA for air-gapped Pro packages | `ppa:yellow/ua-airgapped` |
-| `--create-build-map` | Create templates for VMs, containers, etc. | False |
-| `--build-types` | Types of build templates to create | `vm,container,snap` |
-| `--generate-web-ui` | Create web dashboard for monitoring | False |
-| `--reconfigure` | Update contract token without reinstalling | False |
-| `--estimate-size` | Estimate mirror size before downloading | False |
-| `--verbose` | Enable detailed logging | False |
-
-## Web Dashboard
-
-When enabled with `--generate-web-ui`, PoP creates a web interface accessible at:
+The project has been organized into the following modules:
 
 ```
-http://your-server-ip/
-```
-
-The dashboard provides:
-
-- **Overview**: Mirror status, entitlement counts, and disk usage
-- **Entitlements**: List of available Ubuntu Pro entitlements
-- **Mirror Status**: Repository details and synchronization information
-
-## FIPS Compliance
-
-For environments requiring FIPS-validated cryptographic modules:
-
-1. Include the `fips` entitlement:
-   ```bash
-   sudo ./pop.py --token YOUR_TOKEN --entitlements infra,apps,fips,fips-updates
-   ```
-
-2. Use the VM build templates which include the required `fips=1` kernel parameter:
-   ```bash
-   sudo ./pop.py --token YOUR_TOKEN --create-build-map --build-types vm
-   ```
-
-## Directory Structure
-
-```
-/srv/pop/                   # Default installation directory
-├── debs/                    # Cached package files
-├── etc/
-│   ├── apt/
-│   │   ├── auth.conf.d/     # APT authentication files
-│   │   └── trusted.gpg.d/   # GPG keys for repositories
-│   ├── mirror.list          # APT mirror configuration
-│   ├── nginx/               # Web server configuration
-│   └── ssl/                 # TLS certificates (if used)
+pop/
+├── __init__.py              # Package initialization
+├── main.py                  # Main entry point and CLI handling
+├── config/                  # Configuration management
+│   ├── __init__.py
+│   ├── args.py              # Argument parsing
+│   ├── paths.py             # Path management
+│   └── validator.py         # Config validation
+├── core/                    # Core functionality
+│   ├── __init__.py
+│   ├── contracts.py         # Contract handling
+│   ├── auth.py              # Authentication file management
+│   ├── gpg.py               # GPG key management
+│   └── resources.py         # Resource token management
+├── mirror/                  # Mirror management
+│   ├── __init__.py
+│   ├── apt_mirror.py        # apt-mirror configuration
+│   ├── estimator.py         # Mirror size estimation
+│   ├── repository.py        # Repository management
+│   └── sync.py              # Mirror synchronization
+├── web/                     # Web UI and servers
+│   ├── __init__.py
+│   ├── dashboard.py         # Web UI generator
+│   ├── apache.py            # Apache configuration
+│   └── nginx.py             # Nginx configuration
 ├── builds/                  # Build templates
-│   ├── vm/                  # VM deployment files with FIPS config
-│   ├── container/           # Container build files
-│   └── snap/                # Snap package templates
-├── www/                     # Web dashboard files
-├── snap-proxy/              # Snap proxy configuration
-├── pop.json                # Contract information
-├── pop_resources.json      # Resource tokens
-├── pop.log                 # Operation logs
-└── pop.rc                  # Runtime configuration
+│   ├── __init__.py
+│   ├── vm.py                # VM build templates
+│   ├── container.py         # Container build templates
+│   └── snap.py              # Snap build templates
+├── services/                # Service management
+│   ├── __init__.py
+│   ├── cron.py              # Cron job management
+│   ├── tls.py               # TLS configuration
+│   └── snap_proxy.py        # Snap proxy configuration
+└── utils/                   # Utilities
+    ├── __init__.py
+    ├── system.py            # System utilities
+    ├── logger.py            # Logging utilities
+    └── package.py           # Package management utilities
 ```
 
-## Client Configuration
+## Development
 
-### Configure Ubuntu clients to use PoP
-
-1. **Add the repository**:
+### Setting Up a Development Environment
 
 ```bash
-echo "deb http://pop-server/mirror/esm.ubuntu.com/infra/ubuntu jammy main" | sudo tee /etc/apt/sources.list.d/ubuntu-pop.list
+# Clone the repository
+git clone https://github.com/ThinGuy/pop.git
+cd pop
+
+# Create a virtual environment
+python -m venv venv
+source venv/bin/activate
+
+# Install in development mode
+pip install -e '.[dev]'
 ```
 
-2. **Add the authentication**:
+### Running Tests
 
 ```bash
-# Copy from PoP server
-sudo scp pop-server:/srv/pop/etc/apt/auth.conf.d/91ubuntu-pro /etc/apt/auth.conf.d/
-sudo scp -r pop-server:/srv/pop/etc/apt/trusted.gpg.d/* /etc/apt/trusted.gpg.d/
+# Run unit tests
+pytest
+
+# Run with coverage
+pytest --cov=pop tests/
 ```
 
-3. **Update package lists**:
+### Code Style
+
+This project follows PEP 8 style guidelines. You can check your code with:
 
 ```bash
-sudo apt update
-```
+# Check style
+flake8 pop
 
-## Building with PoP Templates
-
-### Virtual Machine Images with FIPS Support
-
-```bash
-cd /srv/pop/builds/vm
-# Follow instructions in README.md to include FIPS kernel parameter
-```
-
-### Container Images
-
-```bash
-cd /srv/pop/builds/container
-docker build -t pop-enabled-container .
-```
-
-### Snap Packages
-
-```bash
-cd /srv/pop/builds/snap
-snapcraft
-```
-
-## Troubleshooting
-
-### Repository Access Issues
-
-Check authentication file permissions:
-
-```bash
-sudo chmod 600 /etc/apt/auth.conf.d/91ubuntu-pro
-```
-
-### Mirror Sync Problems
-
-Run apt-mirror manually:
-
-```bash
-sudo apt-mirror /srv/pop/etc/mirror.list
-```
-
-### Web Dashboard Not Accessible
-
-Ensure nginx is running and configured:
-
-```bash
-sudo systemctl status nginx
-sudo nginx -t
-```
-
-### Reconfiguration Issues
-
-If reconfiguration fails, verify your installation directory:
-
-```bash
-sudo ls -la /srv/pop
-# Check if directory exists and has correct permissions
+# Format code
+black pop
 ```
 
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## License
 
@@ -278,4 +166,4 @@ This project is licensed under the GNU General Public License v3.0 - see the [LI
 ## Acknowledgments
 
 - The Ubuntu Pro team at Canonical
-- Contributors to the air-gapped Ubuntu Pro technologies
+- Contributors to the air-gapped Ubuntu Pro technologies****
