@@ -1,0 +1,51 @@
+# Plannned script modularity
+
+pop/
+├── __init__.py              # Package initialization
+├── main.py                  # Main entry point and CLI handling
+├── config/
+│   ├── __init__.py
+│   ├── args.py              # Argument parsing
+│   ├── paths.py             # Path management
+│   └── validator.py         # Config validation
+├── core/
+│   ├── __init__.py
+│   ├── contracts.py         # Contract handling
+│   ├── auth.py              # Authentication file management
+│   ├── gpg.py               # GPG key management
+│   └── resources.py         # Resource token management
+├── mirror/
+│   ├── __init__.py
+│   ├── apt_mirror.py        # apt-mirror configuration
+│   ├── estimator.py         # Mirror size estimation
+│   ├── repository.py        # Repository management
+│   └── sync.py              # Mirror synchronization
+├── web/
+│   ├── __init__.py
+│   ├── dashboard.py         # Web UI generator
+│   ├── apache.py            # Apache configuration
+│   └── nginx.py             # Nginx configuration
+├── builds/
+│   ├── __init__.py
+│   ├── vm.py                # VM build templates
+│   ├── container.py         # Container build templates
+│   └── snap.py              # Snap build templates
+├── services/
+│   ├── __init__.py
+│   ├── cron.py              # Cron job management
+│   ├── tls.py               # TLS configuration
+│   └── snap_proxy.py        # Snap proxy configuration
+├── utils/
+│   ├── __init__.py
+│   ├── system.py            # System utilities
+│   ├── logger.py            # Logging utilities
+│   └── package.py           # Package management utilities
+└── templates/               # Template files for UI, configs, etc.
+    ├── web/
+    │   ├── css/
+    │   ├── js/
+    │   └── html/
+    └── builds/
+        ├── vm/
+        ├── container/
+        └── snap/
