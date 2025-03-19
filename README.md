@@ -1,5 +1,9 @@
 # Ubuntu Pro on Premises appliance (PoP)
 
+[![License](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Ubuntu](https://img.shields.io/badge/Ubuntu-20.04%2B-orange)](https://ubuntu.com/)
+[![Security](https://img.shields.io/badge/Security-FIPS%20Ready-brightgreen)](https://ubuntu.com/security)
+
 ![Ubuntu Pro](img/Ubuntu-Pro-Logo-Light.jpg)
 
 **PoP** is a secure, air-gapped solution designed to deliver **Ubuntu Pro** services in isolated environments. It enables enterprises to bring the full power of Ubuntu Pro to networks without direct internet access, ensuring critical security updates and certified packages are available.
