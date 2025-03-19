@@ -31,25 +31,25 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/popa.git
-cd popa
+git clone https://github.com/yourusername/pop.git
+cd pop
 
 # Run the installer with your Ubuntu Pro token
-sudo ./popa.py --token YOUR_TOKEN
+sudo ./pop.py --token YOUR_TOKEN
 ```
 
 ### Advanced Installation
 
 ```bash
 # Full installation with custom settings
-sudo ./popa.py \
+sudo ./pop.py \
   --token YOUR_TOKEN \
-  --dir /path/to/popa \
+  --dir /path/to/pop \
   --release jammy \
   --arch amd64,arm64 \
   --entitlements infra,apps,fips,cis \
   --include-source \
-  --mirror-host popa.internal \
+  --mirror-host pop.internal \
   --mirror-port 80 \
   --generate-web-ui \
   --estimate-size \
@@ -58,46 +58,46 @@ sudo ./popa.py \
 
 ## Usage Examples
 
-### Basic PoPA Server Setup
+### Basic PoP Server Setup
 
 ```bash
-sudo ./popa.py --token YOUR_TOKEN
+sudo ./pop.py --token YOUR_TOKEN
 ```
 
 ### Mirror for Multiple Architectures
 
 ```bash
-sudo ./popa.py --token YOUR_TOKEN --arch amd64,arm64,s390x
+sudo ./pop.py --token YOUR_TOKEN --arch amd64,arm64,s390x
 ```
 
 ### Create Build Templates
 
 ```bash
-sudo ./popa.py --token YOUR_TOKEN --create-build-map
+sudo ./pop.py --token YOUR_TOKEN --create-build-map
 ```
 
 ### Reconfigure with New Token
 
 ```bash
-sudo ./popa.py --token NEW_TOKEN --reconfigure
+sudo ./pop.py --token NEW_TOKEN --reconfigure
 ```
 
 ### Use Local Mirror Hostname
 
 ```bash
-sudo ./popa.py --token YOUR_TOKEN --mirror-host popa.example.com
+sudo ./pop.py --token YOUR_TOKEN --mirror-host pop.example.com
 ```
 
 ### Estimate Mirror Size
 
 ```bash
-sudo ./popa.py --token YOUR_TOKEN --estimate-size
+sudo ./pop.py --token YOUR_TOKEN --estimate-size
 ```
 
 ### Complete Air-Gapped Solution
 
 ```bash
-sudo ./popa.py \
+sudo ./pop.py \
   --token YOUR_TOKEN \
   --generate-web-ui \
   --create-build-map \
@@ -110,7 +110,7 @@ sudo ./popa.py \
 | Option | Description | Default |
 |--------|-------------|---------|
 | `--token` | Ubuntu Pro token (required) | None |
-| `--dir` | Base installation directory | `/srv/popa` |
+| `--dir` | Base installation directory | `/srv/pop` |
 | `--release` | Ubuntu release codename | Current LTS |
 | `--arch` | Comma-separated list of architectures | `amd64` |
 | `--entitlements` | Comma-separated list of entitlements | `infra,apps,fips,fips-updates,fips-preview,cis,usg` |
@@ -130,7 +130,7 @@ sudo ./popa.py \
 
 ## Web Dashboard
 
-When enabled with `--generate-web-ui`, PoPA creates a web interface accessible at:
+When enabled with `--generate-web-ui`, PoP creates a web interface accessible at:
 
 ```
 http://your-server-ip/
@@ -148,18 +148,18 @@ For environments requiring FIPS-validated cryptographic modules:
 
 1. Include the `fips` entitlement:
    ```bash
-   sudo ./popa.py --token YOUR_TOKEN --entitlements infra,apps,fips,fips-updates
+   sudo ./pop.py --token YOUR_TOKEN --entitlements infra,apps,fips,fips-updates
    ```
 
 2. Use the VM build templates which include the required `fips=1` kernel parameter:
    ```bash
-   sudo ./popa.py --token YOUR_TOKEN --create-build-map --build-types vm
+   sudo ./pop.py --token YOUR_TOKEN --create-build-map --build-types vm
    ```
 
 ## Directory Structure
 
 ```
-/srv/popa/                   # Default installation directory
+/srv/pop/                   # Default installation directory
 ├── debs/                    # Cached package files
 ├── etc/
 │   ├── apt/
@@ -174,28 +174,28 @@ For environments requiring FIPS-validated cryptographic modules:
 │   └── snap/                # Snap package templates
 ├── www/                     # Web dashboard files
 ├── snap-proxy/              # Snap proxy configuration
-├── popa.json                # Contract information
-├── popa_resources.json      # Resource tokens
-├── popa.log                 # Operation logs
-└── popa.rc                  # Runtime configuration
+├── pop.json                # Contract information
+├── pop_resources.json      # Resource tokens
+├── pop.log                 # Operation logs
+└── pop.rc                  # Runtime configuration
 ```
 
 ## Client Configuration
 
-### Configure Ubuntu clients to use PoPA
+### Configure Ubuntu clients to use PoP
 
 1. **Add the repository**:
 
 ```bash
-echo "deb http://popa-server/mirror/esm.ubuntu.com/infra/ubuntu jammy main" | sudo tee /etc/apt/sources.list.d/ubuntu-popa.list
+echo "deb http://pop-server/mirror/esm.ubuntu.com/infra/ubuntu jammy main" | sudo tee /etc/apt/sources.list.d/ubuntu-pop.list
 ```
 
 2. **Add the authentication**:
 
 ```bash
-# Copy from PoPA server
-sudo scp popa-server:/srv/popa/etc/apt/auth.conf.d/91ubuntu-pro /etc/apt/auth.conf.d/
-sudo scp -r popa-server:/srv/popa/etc/apt/trusted.gpg.d/* /etc/apt/trusted.gpg.d/
+# Copy from PoP server
+sudo scp pop-server:/srv/pop/etc/apt/auth.conf.d/91ubuntu-pro /etc/apt/auth.conf.d/
+sudo scp -r pop-server:/srv/pop/etc/apt/trusted.gpg.d/* /etc/apt/trusted.gpg.d/
 ```
 
 3. **Update package lists**:
@@ -204,26 +204,26 @@ sudo scp -r popa-server:/srv/popa/etc/apt/trusted.gpg.d/* /etc/apt/trusted.gpg.d
 sudo apt update
 ```
 
-## Building with PoPA Templates
+## Building with PoP Templates
 
 ### Virtual Machine Images with FIPS Support
 
 ```bash
-cd /srv/popa/builds/vm
+cd /srv/pop/builds/vm
 # Follow instructions in README.md to include FIPS kernel parameter
 ```
 
 ### Container Images
 
 ```bash
-cd /srv/popa/builds/container
-docker build -t popa-enabled-container .
+cd /srv/pop/builds/container
+docker build -t pop-enabled-container .
 ```
 
 ### Snap Packages
 
 ```bash
-cd /srv/popa/builds/snap
+cd /srv/pop/builds/snap
 snapcraft
 ```
 
@@ -242,7 +242,7 @@ sudo chmod 600 /etc/apt/auth.conf.d/91ubuntu-pro
 Run apt-mirror manually:
 
 ```bash
-sudo apt-mirror /srv/popa/etc/mirror.list
+sudo apt-mirror /srv/pop/etc/mirror.list
 ```
 
 ### Web Dashboard Not Accessible
@@ -259,7 +259,7 @@ sudo nginx -t
 If reconfiguration fails, verify your installation directory:
 
 ```bash
-sudo ls -la /srv/popa
+sudo ls -la /srv/pop
 # Check if directory exists and has correct permissions
 ```
 
