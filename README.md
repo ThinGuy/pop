@@ -1,6 +1,6 @@
 # Ubuntu Pro on Premises Appliance (PoPA)
 
-![Ubuntu Pro](https://drive.google.com/file/d/15K7Ooj82qArfaKQ7XIdQofns0PWMpP1P/view?usp=sharing)
+![Ubuntu Pro](img/Ubuntu-Pro-Logo-Light.jpg)
 
 **PoPA** is a secure, air-gapped solution designed to deliver **Ubuntu Pro** services in isolated environments. It enables enterprises to bring the full power of Ubuntu Pro to networks without direct internet access, ensuring critical security updates and certified packages are available.
 
