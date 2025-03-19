@@ -142,4 +142,26 @@ def _process_arguments(args: argparse.Namespace) -> argparse.Namespace:
     args.mirror_components = args.mirror_components.split(",")
     args.mirror_pockets = args.mirror_pockets.split(",")
     
-    if hasattr
+    if hasattr(args, 'build_types') and args.build_types:
+        args.build_types = args.build_types.split(",")
+    
+    # Validate architectures
+    for arch in args.architectures:
+        if arch not in SUPPORTED_ARCHITECTURES and arch != "source":
+            logging.error(f"Unsupported architecture: {arch}")
+            logging.error(f"Supported architectures: {', '.join(SUPPORTED_ARCHITECTURES)} and 'source'")
+            sys.exit(1)
+    
+    # Add source if requested
+    if args.include_source and "source" not in args.architectures:
+        args.architectures.append("source")
+    
+    # Validate build types if creating build map
+    if args.create_build_map:
+        for build_type in args.build_types:
+            if build_type not in BUILD_TYPES:
+                logging.error(f"Unsupported build type: {build_type}")
+                logging.error(f"Supported build types: {', '.join(BUILD_TYPES)}")
+                sys.exit(1)
+    
+    return args
