@@ -5,9 +5,8 @@ Command-line argument handling for Ubuntu Pro on Premises (PoP)
 import argparse
 import sys
 import logging
+import subprocess
 from typing import Dict, List
-
-from pop.utils.system import get_current_lts, get_system_fqdn_or_ip
 
 # Define constants
 DEFAULT_RELEASE = "jammy"  # Current LTS by default
@@ -18,13 +17,48 @@ SUPPORTED_RELEASES = ["trusty", "xenial", "bionic", "focal", "jammy", "noble"]  
 BUILD_TYPES = ["vm", "container", "snap"]
 
 
-def parse_arguments() -> argparse.Namespace:
-    """
-    Parse command-line arguments
+def get_current_lts() -> str:
+    """Get the current LTS release codename"""
+    try:
+        lts = subprocess.check_output(
+            ["ubuntu-distro-info", "-c", "--lts"], 
+            text=True
+        ).strip()
+        return lts.lower()
+    except (subprocess.SubprocessError, FileNotFoundError):
+        logging.warning(f"Could not determine current LTS, using default: {DEFAULT_RELEASE}")
+        return DEFAULT_RELEASE
+
+
+def get_system_fqdn_or_ip() -> str:
+    """Get the system's FQDN or IP address for use as default mirror host"""
+    try:
+        # First try to get FQDN using hostname -f
+        fqdn = subprocess.check_output(["hostname", "-f"], text=True).strip()
+        if fqdn and not fqdn.startswith("localhost"):
+            return fqdn
+    except subprocess.SubprocessError:
+        pass
     
-    Returns:
-        argparse.Namespace: Parsed arguments
-    """
+    # If FQDN not available, try to get the primary IP address
+    try:
+        # Get all IP addresses and pick the first non-localhost one
+        ip_output = subprocess.check_output(
+            ["hostname", "-I"], text=True
+        ).strip().split()
+        
+        for ip in ip_output:
+            if not ip.startswith("127."):
+                return ip
+    except subprocess.SubprocessError:
+        pass
+    
+    # Fallback to localhost if nothing else works
+    return "localhost"
+
+
+def parse_arguments() -> argparse.Namespace:
+    """Parse command-line arguments"""
     # Get system FQDN or IP as default for mirror host
     default_mirror_host = get_system_fqdn_or_ip()
     
@@ -112,6 +146,9 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--run-apt-mirror", action="store_true",
                         help="Run apt-mirror to start the initial mirror download")
     
+    parser.add_argument("--production", action="store_true",
+                        help="Configure services to start at boot for production use")
+    
     parser.add_argument("--verbose", "-v", action="store_true",
                         help="Enable verbose output")
     
@@ -124,25 +161,14 @@ def parse_arguments() -> argparse.Namespace:
 
 
 def _process_arguments(args: argparse.Namespace) -> argparse.Namespace:
-    """
-    Process and validate parsed arguments
-    
-    Args:
-        args: Parsed command-line arguments
-        
-    Returns:
-        Processed arguments
-        
-    Raises:
-        SystemExit: If validation fails
-    """
+    """Process and validate parsed arguments"""
     # Convert comma-separated values to lists
     args.architectures = args.architectures.split(",")
     args.entitlements = args.entitlements.split(",")
     args.mirror_components = args.mirror_components.split(",")
     args.mirror_pockets = args.mirror_pockets.split(",")
     
-    if hasattr(args, 'build_types') and args.build_types:
+    if hasattr(args, 'build_types'):
         args.build_types = args.build_types.split(",")
     
     # Validate architectures
