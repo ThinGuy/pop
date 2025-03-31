@@ -4,7 +4,7 @@ Systemd service management for Ubuntu Pro on Premises (PoP)
 
 import os
 import logging
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 
 from pop.utils.system import run_command
 
