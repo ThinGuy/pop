@@ -37,7 +37,6 @@ def setup_logging(verbose: bool = False, log_file: Optional[str] = "/srv/pop/pop
     logger.addHandler(console_handler)
 
     # If log file is provided, add file handler
-    log_file="/srv/pop/andrew-log.log"
     if log_file:
         # Create directory if it doesn't exist
         log_dir = os.path.dirname(log_file)
@@ -46,7 +45,7 @@ def setup_logging(verbose: bool = False, log_file: Optional[str] = "/srv/pop/pop
             
         # Create file handler
         file_handler = logging.FileHandler(log_file)
-        file_handler.setLevel(logging.DEBUG)
+        file_handler.setLevel(log_level)
         file_format = logging.Formatter('%(asctime)s [%(levelname)s] %(name)s: %(message)s')
         file_handler.setFormatter(file_format)
         

@@ -49,7 +49,7 @@ def download_gpg_keys(paths: Dict[str, str], contract_data: Dict[str, Any]) -> N
             # Download and convert key
             logging.info(f"Downloading GPG key for {ent_type}")
             run_command(
-                ["sh", "-c", f"wget -qO- '{key_url}' | gpg --dearmor > '{key_path}'"],
+                [f"wget -qO- '{key_url}' | gpg --dearmor > '{key_path}'"],
                 shell=True
             )
             

@@ -26,16 +26,16 @@ def pull_contract_data(token: str, paths: Dict[str, str]) -> Dict[str, Any]:
         SystemExit: If contract data retrieval fails
     """
     logging.info("Pulling contract data with pro-airgapped")
-    
+
     try:
         # Create a temporary file for the token
         with tempfile.NamedTemporaryFile(mode='w+') as token_file:
             token_file.write(f"{token}:")
             token_file.flush()
-            
+
             # Run pro-airgapped and pipe to yq for JSON output
             command = f"cat {token_file.name} | /usr/bin/pro-airgapped | yq -o=json"
-            result = run_command(["sh", "-c", command], capture_output=True, shell=True)
+            result = run_command([command], capture_output=True, shell=True)
             
             # Save the contract data
             with open(paths["pop_json"], 'w') as json_file:
