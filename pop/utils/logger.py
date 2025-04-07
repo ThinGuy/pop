@@ -11,7 +11,7 @@ import os
 from typing import Optional
 
 
-def setup_logging(verbose: bool = False, log_file: Optional[str] = None) -> None:
+def setup_logging(verbose: bool = False, log_file: Optional[str] = None):
     """
     Configure logging for the PoP application.
     
@@ -24,12 +24,20 @@ def setup_logging(verbose: bool = False, log_file: Optional[str] = None) -> None
     """
     # Set up log level based on verbosity
     log_level = logging.DEBUG if verbose else logging.INFO
-    
+
     # Configure basic logging to console
-    console_format = '[%(levelname)s] %(message)s'
-    logging.basicConfig(level=log_level, format=console_format)
-    
+    console_format = logging.Formatter('[%(levelname)s] %(message)s')
+    logger = logging.getLogger()
+    logger.setLevel(log_level)
+    logger.propagate = False
+
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(log_level)
+    console_handler.setFormatter(console_format)
+    logger.addHandler(console_handler)
+
     # If log file is provided, add file handler
+    log_file="/srv/pop/andrew-log.log"
     if log_file:
         # Create directory if it doesn't exist
         log_dir = os.path.dirname(log_file)
@@ -38,14 +46,13 @@ def setup_logging(verbose: bool = False, log_file: Optional[str] = None) -> None
             
         # Create file handler
         file_handler = logging.FileHandler(log_file)
-        file_format = '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
-        file_formatter = logging.Formatter(file_format)
-        file_handler.setFormatter(file_formatter)
+        file_handler.setLevel(logging.DEBUG)
+        file_format = logging.Formatter('%(asctime)s [%(levelname)s] %(name)s: %(message)s')
+        file_handler.setFormatter(file_format)
         
         # Add handler to root logger
-        root_logger = logging.getLogger()
-        root_logger.addHandler(file_handler)
+        logger.addHandler(file_handler)
         
-        logging.debug(f"Logging configured. Log file: {log_file}")
+        logger.debug(f"Logging configured. Log file: {log_file}")
     else:
-        logging.debug("Logging configured for console output only")
+        logger.debug("Logging configured for console output only")
