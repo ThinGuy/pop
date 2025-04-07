@@ -11,7 +11,7 @@ import os
 from typing import Optional
 
 
-def setup_logging(verbose: bool = False, log_file: Optional[str] = None):
+def setup_logging(verbose: bool = False, log_file: Optional[str] = "/srv/pop/pop.log"):
     """
     Configure logging for the PoP application.
     
