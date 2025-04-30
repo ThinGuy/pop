@@ -41,7 +41,7 @@ def install_prerequisites(offline_repo: str = "ppa:yellow/ua-airgapped") -> None
         run_command(["snap", "install", "yq", "--stable"])
         
         # Install snap-proxy-server
-        run_command(["snap", "install", "snap-proxy-server"])
+        run_command(["snap", "install", "snap-store-proxy"])
         
         # Add PPA for air-gapped packages
         run_command(
